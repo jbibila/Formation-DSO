@@ -84,22 +84,25 @@ def uploaded():
                 return render_template('error.html', err=err)
             else:
                 print(f"{Fore.GREEN}[+] file uploded ! {file_name}{Fore.RESET}")
-                path = f'{Path(__file__).parent}'
-                path_full_write = f"{path}\\files\{file_name}"
-                content = readfile(file_name)
+                base_path = os.path.abspath(f'{Path(__file__).parent}/files')
+                path_full_write = os.path.normpath(os.path.join(base_path, file_name))
+                if not path_full_write.startswith(base_path):
+                    err = "Invalid file path"
+                    return render_template('error.html', err=err)
+                content = readfile(path_full_write)
                 writefile(path_full_write, content)
 
 
     return render_template('upload.html', file_content=file_content)
 
-def  readfile(file_name):
-    with open (file_name, "r") as fichier:
+def  readfile(file_path):
+    with open (file_path, "r") as fichier:
         content = fichier.read()
     return content
 
 
-def writefile(full_path, content):
-    with open(full_path, "w+") as fichier:
+def writefile(file_path, content):
+    with open(file_path, "w+") as fichier:
         fichier.write(content)
 
 
